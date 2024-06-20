@@ -1,0 +1,4 @@
+__azurite*
+*.vsix
+node_modules
+_queuestorage*

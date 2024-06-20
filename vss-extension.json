@@ -1,0 +1,38 @@
+{
+  "manifestVersion": 1,
+  "id": "plainjs-hub-extension",
+  "publisher": "AgileMindset",
+  "version": "1.21.0",
+  "name": "My Sample JS Extension",
+  "description": "A sample Visual Studio Services extension",
+  "public": false,
+  "categories": ["Azure Repos"],
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "scopes": ["vso.code", "vso.extension_manage"],
+  "contributions": [
+    {
+      "id": "my-hub",
+      "type": "ms.vss-web.hub",
+      "targets": ["ms.vss-code-web.code-hub-group"],
+      "properties": {
+        "name": "My Hub",
+        "uri": "hub.html"
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "hub.html",
+      "addressable": true
+    },
+    {
+      "path": "node_modules/azure-devops-extension-sdk",
+      "addressable": true,
+      "packagePath": "lib/sdk"
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+    <script>
+      window.requirejs.config({
+        enforceDefine: true,
+        paths: {
+          SDK: "./lib/sdk/SDK.min",
+          jquery:
+            "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min",
+        },
+      });
+
+      function getExtensionData() {
+        // We need to ensure the SDK (and jquery in this case) are loaded before we can use them
+        // NOTE!! This is an ALTERNATIVE in using JQuery, this is only showing you CAN load it as a module
+        // to showcase how you would use the window.requirejs method and not related to Azure DevOps or the SDK
+        window.requirejs(["SDK", "jquery"], function (SDK, $) {
+          console.log("SDK and jQuery are loaded");
+          SDK.init();
+          SDK.ready().then(async () => {
+            // In here we can use the SDK
+            // Reference this article as needed
+            // https://learn.microsoft.com/en-us/azure/devops/extend/develop/data-storage?view=azure-devops#update-a-document
+            console.log("SDK is ready");
+
+            const token = await SDK.getAccessToken();
+            console.log("accessToken:", token);
+
+            const extDataService = await SDK.getService(
+              "ms.vss-features.extension-data-service"
+            );
+
+            const dataManager = await extDataService.getExtensionDataManager(
+              SDK.getExtensionContext().id,
+              token
+            );
+            console.log("dataManager:", dataManager);
+
+            // Detail on where in the extension data the document should be located
+            let scopeType = $("#scopeTypeDropdown").val();
+            let scopeValue = $("#scopeValueDropDown").val();
+            let collectionName = $("#collectionNameInput").val();
+            let documentId = $("#documentIdInput").val();
+
+            // If there is an error (say the document doesn't exist), the error will be caught and displayed
+            try {
+                // Retrieve the document using the document manager
+                documentData = await dataManager.getDocument(
+                    collectionName,
+                    documentId,
+                    {
+                        scopeType: scopeType,
+                        scopeValue: scopeValue
+                    }
+                );
+                console.log("documentData:", documentData);
+
+                $("#outputLabel").text(JSON.stringify(documentData, null, 2));
+            } catch (error) {
+                console.error(error);
+                $("#outputLabel").text("Could not get specified document: " + error.message);
+            }
+          });
+        });
+      }
+
+      // Initialize the SDK to ensure our extension is loaded successfully
+      window.requirejs(["SDK"], function (SDK) {
+        if (typeof SDK !== "undefined") {
+          console.log("SDK is defined. Trying to initialize...");
+          SDK.init();
+          SDK.ready().then(() => {
+            console.log("SDK is ready");
+            document.getElementById("name").innerText = SDK.getUser().displayName;
+          });
+        } else {
+          console.log("SDK is not defined");
+        }
+      });
+    </script>
+    <style>
+      body {
+        background-color: rgb(237, 243, 248);
+        color: white;
+        margin: 10px;
+        font-family: "Segoe UI VSS (Regular)", "-apple-system",
+          BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Hello, <span id="name"></span></h1>    
+    <br />
+    <table style="border-collapse: collapse;">
+        <tr>
+            <td><label for="scopeTypeDropdown">Scope Type:</label></td>
+            <td>
+                <select id="scopeTypeDropdown">
+                    <option value="Default" selected>Default</option>
+                    <option value="User">User</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><label for="scopeValueDropDown">Scope Value:</label></td>
+            <td>
+                <select id="scopeValueDropDown">
+                    <option value="Current" selected>Current</option>
+                    <option value="Me">Me</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><label for="collectionNameInput">Collection Name:</label></td>
+            <td><input type="text" id="collectionNameInput" value="$settings"></td>
+        </tr>
+        <tr>
+            <td><label for="documentIdInput">Document ID:</label></td>
+            <td><input type="text" id="documentIdInput" value="mydoc2"></td>
+        </tr>
+    </table>
+    <button id="getDataButton" onclick="getExtensionData()">Get Document Data</button>
+    <br />
+    <pre style="background-color: white; white-space: pre-wrap;" id="outputLabel"></pre>
+  </body>
+</html>
