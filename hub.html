@@ -17,15 +17,12 @@
         // NOTE!! This is an ALTERNATIVE in using JQuery, this is only showing you CAN load it as a module
         // to showcase how you would use the window.requirejs method and not related to Azure DevOps or the SDK
         window.requirejs(["SDK", "jquery"], function (SDK, $) {
-          console.log("SDK and jQuery are loaded");
-          SDK.init();
-          SDK.ready().then(async () => {
-            // In here we can use the SDK
-            // Reference this article as needed
-            // https://learn.microsoft.com/en-us/azure/devops/extend/develop/data-storage?view=azure-devops#update-a-document
-            console.log("SDK is ready");
+          // In here we can use the SDK
+          // Reference this article as needed
+          // https://learn.microsoft.com/en-us/azure/devops/extend/develop/data-storage?view=azure-devops#update-a-document
+          console.log("SDK is ready");
 
-            const token = await SDK.getAccessToken();
+          SDK.getAccessToken().then(async (token) => {
             console.log("accessToken:", token);
 
             const extDataService = await SDK.getService(
@@ -46,24 +43,27 @@
 
             // If there is an error (say the document doesn't exist), the error will be caught and displayed
             try {
-                // Retrieve the document using the document manager
-                documentData = await dataManager.getDocument(
-                    collectionName,
-                    documentId,
-                    {
-                        scopeType: scopeType,
-                        scopeValue: scopeValue
-                    }
-                );
-                console.log("documentData:", documentData);
+              // Retrieve the document using the document manager
+              documentData = await dataManager.getDocument(
+                collectionName,
+                documentId,
+                {
+                  scopeType: scopeType,
+                  scopeValue: scopeValue,
+                }
+              );
+              console.log("documentData:", documentData);
 
-                $("#outputLabel").text(JSON.stringify(documentData, null, 2));
+              $("#outputLabel").text(JSON.stringify(documentData, null, 2));
             } catch (error) {
-                console.error(error);
-                $("#outputLabel").text("Could not get specified document: " + error.message);
+              console.error(error);
+              $("#outputLabel").text(
+                "Could not get specified document: " + error.message
+              );
             }
           });
         });
+        // });
       }
 
       // Initialize the SDK to ensure our extension is loaded successfully
@@ -73,7 +73,8 @@
           SDK.init();
           SDK.ready().then(() => {
             console.log("SDK is ready");
-            document.getElementById("name").innerText = SDK.getUser().displayName;
+            document.getElementById("name").innerText =
+              SDK.getUser().displayName;
           });
         } else {
           console.log("SDK is not defined");
@@ -91,38 +92,45 @@
     </style>
   </head>
   <body>
-    <h1>Hello, <span id="name"></span></h1>    
+    <h1>Hello, <span id="name"></span></h1>
     <br />
-    <table style="border-collapse: collapse;">
-        <tr>
-            <td><label for="scopeTypeDropdown">Scope Type:</label></td>
-            <td>
-                <select id="scopeTypeDropdown">
-                    <option value="Default" selected>Default</option>
-                    <option value="User">User</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td><label for="scopeValueDropDown">Scope Value:</label></td>
-            <td>
-                <select id="scopeValueDropDown">
-                    <option value="Current" selected>Current</option>
-                    <option value="Me">Me</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td><label for="collectionNameInput">Collection Name:</label></td>
-            <td><input type="text" id="collectionNameInput" value="$settings"></td>
-        </tr>
-        <tr>
-            <td><label for="documentIdInput">Document ID:</label></td>
-            <td><input type="text" id="documentIdInput" value="mydoc2"></td>
-        </tr>
+    <table style="border-collapse: collapse">
+      <tr>
+        <td><label for="scopeTypeDropdown">Scope Type:</label></td>
+        <td>
+          <select id="scopeTypeDropdown">
+            <option value="Default" selected>Default</option>
+            <option value="User">User</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td><label for="scopeValueDropDown">Scope Value:</label></td>
+        <td>
+          <select id="scopeValueDropDown">
+            <option value="Current" selected>Current</option>
+            <option value="Me">Me</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td><label for="collectionNameInput">Collection Name:</label></td>
+        <td>
+          <input type="text" id="collectionNameInput" value="$settings" />
+        </td>
+      </tr>
+      <tr>
+        <td><label for="documentIdInput">Document ID:</label></td>
+        <td><input type="text" id="documentIdInput" value="mydoc2" /></td>
+      </tr>
     </table>
-    <button id="getDataButton" onclick="getExtensionData()">Get Document Data</button>
+    <button id="getDataButton" onclick="getExtensionData()">
+      Get Document Data
+    </button>
     <br />
-    <pre style="background-color: white; white-space: pre-wrap;" id="outputLabel"></pre>
+    <pre
+      style="background-color: white; white-space: pre-wrap"
+      id="outputLabel"
+    ></pre>
   </body>
 </html>

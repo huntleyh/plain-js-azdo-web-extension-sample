@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "plainjs-hub-extension",
   "publisher": "AgileMindset",
-  "version": "1.21.0",
+  "version": "1.23.0",
   "name": "My Sample JS Extension",
   "description": "A sample Visual Studio Services extension",
   "public": false,
